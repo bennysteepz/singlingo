@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
-import KaraokePlayer from './src/components/KaraokePlayer';
+import SingLingoPlayer from './src/components/SingLingoPlayer';
 import { sampleSongs } from './src/data/songs';
 import { Song } from './src/types';
 
@@ -17,7 +17,7 @@ export default function App() {
         >
           <Text style={styles.backButtonText}>← Back to Songs</Text>
         </TouchableOpacity>
-        <KaraokePlayer 
+        <SingLingoPlayer 
           song={selectedSong}
           onWordTap={(word, wordIndex) => {
             console.log(`Tapped word: ${word.text} at index ${wordIndex}`);
@@ -41,7 +41,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.appTitle}>🎤 Karaoke Lingo</Text>
+        <Text style={styles.appTitle}>🎤 Sing Lingo</Text>
         <Text style={styles.appSubtitle}>Learn languages through music</Text>
       </View>
       

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "karaokelingo",
-    "slug": "karaokelingo",
+      "name": "singlingo",
+  "slug": "singlingo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

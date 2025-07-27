@@ -1,7 +1,7 @@
 
-# 🎤 Karaoke Lingo
+# 🎤 Sing Lingo
 
-A minimalist React Native app for learning languages by singing along — karaoke-style.
+A minimalist React Native app for learning languages by singing along — sing-style.
 
 Instead of drills or flashcards, users learn through *vibes*: listening, repetition, and real song lyrics. As you hear each word more, it fades away — until you're singing fluently with only the translation to guide you.
 
@@ -25,7 +25,7 @@ Instead of drills or flashcards, users learn through *vibes*: listening, repetit
 ## 🧠 Learning Method
 
 Language is best learned with emotion, music, and rhythm.  
-**Karaoke Lingo** doesn't test you — it lets you vibe your way to fluency.
+**Sing Lingo** doesn't test you — it lets you vibe your way to fluency.
 
 ---
 
@@ -96,16 +96,16 @@ function getOpacity(views) {
 
 ---
 
-## 🙌 Why “Karaoke Lingo”?
+## 🙌 Why "Sing Lingo"?
 
-Because it’s not just about music — it’s about learning language through sound, culture, and good vibes.  
-Whether you're at a karaoke room in Hawaiʻi or learning on your phone in bed, you're picking up real, memorable language — one verse at a time.
+Because it's not just about music — it's about learning language through sound, culture, and good vibes.  
+Whether you're at a singing room in Hawaiʻi or learning on your phone in bed, you're picking up real, memorable language — one verse at a time.
 
 ---
 
 ## 📦 Coming Soon
 
-- Stats view: “Your most-played words”
+- Stats view: "Your most-played words"
 - Daily play goals
 - Reverse mode (translation only)
 - Upload your own songs
@@ -114,4 +114,4 @@ Whether you're at a karaoke room in Hawaiʻi or learning on your phone in bed, y
 
 ## 🧡 Built By
 
-A linguist + karaoke lover from Hawaiʻi, with a soft spot for singing with friends and learning through music.
+A linguist + singing lover from Hawaiʻi, with a soft spot for singing with friends and learning through music.

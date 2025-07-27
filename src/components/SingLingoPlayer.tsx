@@ -5,12 +5,12 @@ import { Song, LyricLine, Word } from '../types';
 import { getWordStyle } from '../utils/fadeLogic';
 import { trackWordView, getWordViewCounts } from '../utils/wordTracking';
 
-interface KaraokePlayerProps {
+interface SingLingoPlayerProps {
   song: Song;
   onWordTap?: (word: Word, wordIndex: number) => void;
 }
 
-export default function KaraokePlayer({ song, onWordTap }: KaraokePlayerProps) {
+export default function SingLingoPlayer({ song, onWordTap }: SingLingoPlayerProps) {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);

@@ -1,4 +1,4 @@
-# 🚀 Karaoke Lingo Setup Instructions
+# 🚀 Sing Lingo Setup Instructions
 
 ## Prerequisites
 
