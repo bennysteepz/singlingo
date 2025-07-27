@@ -19,8 +19,8 @@ export default function App() {
         </TouchableOpacity>
         <SingLingoPlayer 
           song={selectedSong}
-          onWordTap={(word, wordIndex) => {
-            console.log(`Tapped word: ${word.text} at index ${wordIndex}`);
+          onUtteranceTap={(utterance, utteranceIndex) => {
+            console.log(`Tapped utterance: ${utterance.text} at index ${utteranceIndex}`);
           }}
         />
         <StatusBar style="auto" />

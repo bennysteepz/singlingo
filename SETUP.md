@@ -25,21 +25,22 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 3. In your Supabase project dashboard, go to **SQL Editor** and run this query to create the word tracking table:
 
 ```sql
--- Create word_tracking table
+-- Create word_tracking table (for future word-level analytics)
+-- This tracks words across all utterances - same word gets collective count
 CREATE TABLE word_tracking (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID DEFAULT auth.uid(),
   song_id TEXT NOT NULL,
   word_text TEXT NOT NULL,
-  word_index INTEGER NOT NULL,
   view_count INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, song_id, word_text) -- Ensure one record per user/song/word
 );
 
 -- Create index for fast lookups
 CREATE INDEX idx_word_tracking_lookup 
-ON word_tracking(user_id, song_id, word_text, word_index);
+ON word_tracking(user_id, song_id, word_text);
 
 -- Enable Row Level Security (optional, for user isolation)
 ALTER TABLE word_tracking ENABLE ROW LEVEL SECURITY;
@@ -68,10 +69,10 @@ Then scan the QR code with the Expo Go app on your phone, or press `i` for iOS s
 ## 🎵 How It Works
 
 1. **Audio Sync**: The app polls audio position every ~100ms to sync with lyrics
-2. **Word Tracking**: Each time a word is heard during playback, its view count increases
-3. **Fade Logic**: Words fade out after 10 views and disappear after 20 views
-4. **Tap to Jump**: Tap any word to jump to that point in the song
-5. **Cross-Device Sync**: View counts are stored in Supabase for persistence
+2. **Utterance Display**: Each timed segment (utterance) can be tapped to jump to that point
+3. **Fade Logic**: Utterances fade out after 10 views and disappear after 20 views
+4. **Word Analytics** (Future): Track words across all utterances for learning analytics
+5. **Ready for Expansion**: Infrastructure set up for word-level features like progress tracking
 
 ## 📝 Adding New Songs
 

@@ -1,23 +1,22 @@
 import { supabase } from './supabase';
-import { Word } from '../types';
+import { Utterance } from '../types';
 
 /**
- * Track that a word has been viewed/heard
+ * FUTURE FEATURE: Track that a word has been viewed/heard across all utterances
+ * This will enable analytics like "most heard words", "learning progress", etc.
  */
 export async function trackWordView(
   songId: string, 
   wordText: string, 
-  wordIndex: number,
   userId?: string
 ): Promise<number> {
   try {
-    // First, try to get existing record
+    // First, try to get existing record for this word (across all utterances)
     const { data: existing, error: fetchError } = await supabase
       .from('word_tracking')
       .select('view_count')
       .eq('song_id', songId)
       .eq('word_text', wordText)
-      .eq('word_index', wordIndex)
       .eq('user_id', userId || 'anonymous')
       .single();
 
@@ -28,14 +27,13 @@ export async function trackWordView(
 
     const newCount = (existing?.view_count || 0) + 1;
 
-    // Upsert the record
+    // Upsert the record (word-level, not utterance-specific)
     const { error: upsertError } = await supabase
       .from('word_tracking')
       .upsert({
         user_id: userId || 'anonymous',
         song_id: songId,
         word_text: wordText,
-        word_index: wordIndex,
         view_count: newCount,
         updated_at: new Date().toISOString()
       });
@@ -53,7 +51,8 @@ export async function trackWordView(
 }
 
 /**
- * Get view counts for all words in a song
+ * FUTURE FEATURE: Get view counts for all words in a song
+ * Returns word-level counts (same word from different utterances combined)
  */
 export async function getWordViewCounts(
   songId: string, 
@@ -62,7 +61,7 @@ export async function getWordViewCounts(
   try {
     const { data, error } = await supabase
       .from('word_tracking')
-      .select('word_text, word_index, view_count')
+      .select('word_text, view_count')
       .eq('song_id', songId)
       .eq('user_id', userId || 'anonymous');
 
@@ -71,11 +70,10 @@ export async function getWordViewCounts(
       return {};
     }
 
-    // Create a lookup object by word_text and word_index
+    // Create a lookup object by word_text only (not position-specific)
     const counts: Record<string, number> = {};
     data?.forEach(record => {
-      const key = `${record.word_text}_${record.word_index}`;
-      counts[key] = record.view_count;
+      counts[record.word_text] = record.view_count;
     });
 
     return counts;
@@ -83,4 +81,19 @@ export async function getWordViewCounts(
     console.error('Error in getWordViewCounts:', error);
     return {};
   }
+}
+
+/**
+ * FUTURE FEATURE: Get analytics about most/least heard words
+ */
+export async function getWordAnalytics(songId: string, userId?: string) {
+  const wordCounts = await getWordViewCounts(songId, userId);
+  const words = Object.entries(wordCounts);
+  
+  return {
+    totalWords: words.length,
+    mostHeardWords: words.sort(([,a], [,b]) => b - a).slice(0, 10),
+    leastHeardWords: words.sort(([,a], [,b]) => a - b).slice(0, 10),
+    averageViews: words.reduce((sum, [,count]) => sum + count, 0) / words.length || 0
+  };
 } 

@@ -1,31 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Audio, AVPlaybackStatus } from 'expo-av';
-import { Song, LyricLine, Word } from '../types';
-import { getWordStyle } from '../utils/fadeLogic';
-import { trackWordView, getWordViewCounts } from '../utils/wordTracking';
+import { Song, LyricLine, Utterance } from '../types';
+import { getUtteranceStyle } from '../utils/fadeLogic';
+// Word tracking ready for future analytics features
+// import { trackWordView, getWordViewCounts } from '../utils/wordTracking';
 
 interface SingLingoPlayerProps {
   song: Song;
-  onWordTap?: (word: Word, wordIndex: number) => void;
+  onUtteranceTap?: (utterance: Utterance, utteranceIndex: number) => void;
 }
 
-export default function SingLingoPlayer({ song, onWordTap }: SingLingoPlayerProps) {
+export default function SingLingoPlayer({ song, onUtteranceTap }: SingLingoPlayerProps) {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [wordViewCounts, setWordViewCounts] = useState<Record<string, number>>({});
+  const [currentUtteranceIndex, setCurrentUtteranceIndex] = useState(0);
+  const [utteranceViewCounts, setUtteranceViewCounts] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const trackedWords = useRef<Set<string>>(new Set());
+  const trackedUtterances = useRef<Set<string>>(new Set());
 
-  // Load audio and word view counts on mount
+  // Load audio and utterance view counts on mount
   useEffect(() => {
     loadAudio();
-    loadWordViewCounts();
+    loadUtteranceViewCounts();
     
     return () => {
       if (sound) {
@@ -52,12 +53,13 @@ export default function SingLingoPlayer({ song, onWordTap }: SingLingoPlayerProp
     }
   };
 
-  const loadWordViewCounts = async () => {
+  const loadUtteranceViewCounts = async () => {
     try {
-      const counts = await getWordViewCounts(song.id);
-      setWordViewCounts(counts);
+      // For now, start with empty counts - utterances start fresh each session
+      // TODO: Later add persistent utterance tracking if needed
+      setUtteranceViewCounts({});
     } catch (error) {
-      console.error('Error loading word view counts:', error);
+      console.error('Error loading utterance view counts:', error);
     }
   };
 
@@ -71,7 +73,7 @@ export default function SingLingoPlayer({ song, onWordTap }: SingLingoPlayerProp
             const currentMs = status.positionMillis || 0;
             setCurrentTime(currentMs);
             updateCurrentIndices(currentMs);
-            trackCurrentWords(currentMs);
+            trackCurrentUtterances(currentMs);
           }
         } catch (error) {
           console.error('Error getting audio status:', error);
@@ -100,43 +102,40 @@ export default function SingLingoPlayer({ song, onWordTap }: SingLingoPlayerProp
     if (lineIndex !== -1) {
       setCurrentLineIndex(lineIndex);
       
-      // Find current word within the line
+      // Find current utterance within the line
       const currentLine = song.lyrics[lineIndex];
-      const wordIndex = currentLine.words.findIndex(word => 
-        currentMs >= word.start && currentMs <= word.end
+      const utteranceIndex = currentLine.utterances.findIndex(utterance => 
+        currentMs >= utterance.start && currentMs <= utterance.end
       );
       
-      if (wordIndex !== -1) {
-        setCurrentWordIndex(wordIndex);
+      if (utteranceIndex !== -1) {
+        setCurrentUtteranceIndex(utteranceIndex);
       }
     }
   };
 
-  const trackCurrentWords = async (currentMs: number) => {
+  const trackCurrentUtterances = async (currentMs: number) => {
     const currentLine = song.lyrics[currentLineIndex];
     if (!currentLine) return;
 
-    // Track words that are currently being heard
-    currentLine.words.forEach(async (word, wordIndex) => {
-      if (currentMs >= word.start && currentMs <= word.end) {
-        const trackingKey = `${song.id}_${word.text}_${wordIndex}`;
+    // Track utterances that are currently being heard
+    currentLine.utterances.forEach(async (utterance, utteranceIndex) => {
+      if (currentMs >= utterance.start && currentMs <= utterance.end) {
+        const trackingKey = `${song.id}_${currentLineIndex}_${utteranceIndex}`;
         
-        // Only track each word once per playthrough
-        if (!trackedWords.current.has(trackingKey)) {
-          trackedWords.current.add(trackingKey);
+        // Only track each utterance once per playthrough
+        if (!trackedUtterances.current.has(trackingKey)) {
+          trackedUtterances.current.add(trackingKey);
           
-          try {
-            const newCount = await trackWordView(song.id, word.text, wordIndex);
-            
-            // Update local state
-            const viewKey = `${word.text}_${wordIndex}`;
-            setWordViewCounts(prev => ({
-              ...prev,
-              [viewKey]: newCount
-            }));
-          } catch (error) {
-            console.error('Error tracking word view:', error);
-          }
+          // For now, just increment local count (no persistent storage)
+          const viewKey = `${currentLineIndex}_${utteranceIndex}`;
+          setUtteranceViewCounts(prev => ({
+            ...prev,
+            [viewKey]: (prev[viewKey] || 0) + 1
+          }));
+
+          // TODO: Future word-level tracking for analytics
+          // await trackWordView(song.id, utterance.text, wordPosition);
         }
       }
     });
@@ -157,44 +156,45 @@ export default function SingLingoPlayer({ song, onWordTap }: SingLingoPlayerProp
     }
   };
 
-  const jumpToWord = async (word: Word) => {
+  const jumpToUtterance = async (utterance: Utterance) => {
     if (!sound) return;
 
     try {
-      await sound.setPositionAsync(word.start);
-      setCurrentTime(word.start);
+      await sound.setPositionAsync(utterance.start);
+      setCurrentTime(utterance.start);
       
-      // Clear tracked words so they can be re-tracked
-      trackedWords.current.clear();
+      // Clear tracked utterances so they can be re-tracked
+      trackedUtterances.current.clear();
       
-      if (onWordTap) {
-        onWordTap(word, currentWordIndex);
+      if (onUtteranceTap) {
+        onUtteranceTap(utterance, currentUtteranceIndex);
       }
     } catch (error) {
-      console.error('Error jumping to word:', error);
+      console.error('Error jumping to utterance:', error);
     }
   };
 
-  const renderWord = (word: Word, wordIndex: number, lineIndex: number) => {
-    const viewKey = `${word.text}_${wordIndex}`;
-    const viewCount = wordViewCounts[viewKey] || 0;
-    const isCurrentWord = lineIndex === currentLineIndex && wordIndex === currentWordIndex;
+  const renderUtterance = (utterance: Utterance, utteranceIndex: number, lineIndex: number) => {
+    // Get view count for this specific utterance
+    const viewKey = `${lineIndex}_${utteranceIndex}`;
+    const viewCount = utteranceViewCounts[viewKey] || 0;
+    const isCurrentUtterance = lineIndex === currentLineIndex && utteranceIndex === currentUtteranceIndex;
     
     return (
       <TouchableOpacity
-        key={`${lineIndex}-${wordIndex}`}
-        onPress={() => jumpToWord(word)}
+        key={`${lineIndex}-${utteranceIndex}`}
+        onPress={() => jumpToUtterance(utterance)}
         style={[
-          styles.word,
-          isCurrentWord && styles.currentWord
+          styles.utterance,
+          isCurrentUtterance && styles.currentUtterance
         ]}
       >
         <Text style={[
-          styles.wordText,
-          getWordStyle(viewCount),
-          isCurrentWord && styles.currentWordText
+          styles.utteranceText,
+          getUtteranceStyle(viewCount),
+          isCurrentUtterance && styles.currentUtteranceText
         ]}>
-          {word.text}
+          {utterance.text}
         </Text>
       </TouchableOpacity>
     );
@@ -209,8 +209,8 @@ export default function SingLingoPlayer({ song, onWordTap }: SingLingoPlayerProp
         isCurrentLine && styles.currentLineContainer
       ]}>
         <View style={styles.originalLine}>
-          {line.words.map((word, wordIndex) => 
-            renderWord(word, wordIndex, lineIndex)
+          {line.utterances.map((utterance, utteranceIndex) => 
+            renderUtterance(utterance, utteranceIndex, lineIndex)
           )}
         </View>
         <Text style={styles.translation}>{line.translation}</Text>
@@ -301,20 +301,20 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginBottom: 10,
   },
-  word: {
+  utterance: {
     marginRight: 8,
     marginBottom: 5,
     padding: 4,
     borderRadius: 4,
   },
-  currentWord: {
+  currentUtterance: {
     backgroundColor: '#ffeb3b',
   },
-  wordText: {
+  utteranceText: {
     fontSize: 18,
     color: '#333',
   },
-  currentWordText: {
+  currentUtteranceText: {
     fontWeight: 'bold',
   },
   translation: {

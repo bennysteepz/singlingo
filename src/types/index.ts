@@ -1,8 +1,8 @@
-export interface Word {
+export interface Utterance {
   text: string;
   start: number; // milliseconds
   end: number;   // milliseconds
-  views: number; // how many times user has heard this word
+  views: number; // how many times user has heard this utterance
 }
 
 export interface LyricLine {
@@ -10,7 +10,7 @@ export interface LyricLine {
   end: number;          // milliseconds
   original: string;     // original language text
   translation: string;  // English translation
-  words: Word[];
+  utterances: Utterance[];
 }
 
 export interface Song {
@@ -26,5 +26,5 @@ export interface AppState {
   isPlaying: boolean;
   currentTime: number;
   currentLine: number;
-  currentWord: number;
+  currentUtterance: number;
 } 

@@ -9,12 +9,12 @@ Instead of drills or flashcards, users learn through *vibes*: listening, repetit
 
 ## ✨ Features
 
-- 🎵 **Word-by-Word Lyric Sync**
-  - Tap any word to jump to that part of the song
-- 👁️ **Silent Word Tracking**
-  - App logs how many times you’ve heard each word
+- 🎵 **Utterance-by-Utterance Lyric Sync**
+  - Tap any utterance to jump to that part of the song
+- 👁️ **Smart Word Analytics (Future)**
+  - Track words across all utterances for learning insights
 - 🌫️ **Fade-Away Learning**
-  - Words fade/disappear as you become more familiar
+  - Utterances fade/disappear as you become more familiar
 - 🌍 **Line-by-Line Translations**
   - Translations appear under each line, always visible
 - ⚡ **Offline Friendly**
@@ -63,7 +63,7 @@ All sourced from **public domain** lyrics and recordings.
     "end": 2000,
     "original": "Ua like nō a like",
     "translation": "So very much alike",
-    "words": [
+    "utterances": [
       { "text": "Ua", "start": 0, "end": 500, "views": 0 },
       { "text": "like", "start": 500, "end": 1000, "views": 0 },
       { "text": "nō", "start": 1000, "end": 1500, "views": 0 },
@@ -76,9 +76,10 @@ All sourced from **public domain** lyrics and recordings.
 
 ---
 
-## 🎚️ Word Fade Logic
+## 🎚️ Fade Logic
 
 ```ts
+// Currently applied to utterances, ready for word-level features
 function getOpacity(views) {
   if (views < 10) return 1; // visible
   if (views < 20) return 1 - (views - 10) / 10; // fade out

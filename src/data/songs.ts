@@ -12,7 +12,7 @@ export const sampleSongs: Song[] = [
         end: 4000,
         original: "Ua like nō a like",
         translation: "So very much alike",
-        words: [
+        utterances: [
           { text: "Ua", start: 0, end: 800, views: 0 },
           { text: "like", start: 800, end: 1600, views: 0 },
           { text: "nō", start: 1600, end: 2400, views: 0 },
@@ -25,7 +25,7 @@ export const sampleSongs: Song[] = [
         end: 8000,
         original: "E ku'u sweetheart",
         translation: "Oh my sweetheart",
-        words: [
+        utterances: [
           { text: "E", start: 4000, end: 4500, views: 0 },
           { text: "ku'u", start: 4500, end: 6000, views: 0 },
           { text: "sweetheart", start: 6000, end: 8000, views: 0 }
@@ -44,7 +44,7 @@ export const sampleSongs: Song[] = [
         end: 6000,
         original: "Калинка, калинка, калинка моя!",
         translation: "Little snowball tree, my snowball!",
-        words: [
+        utterances: [
           { text: "Калинка,", start: 0, end: 1500, views: 0 },
           { text: "калинка,", start: 1500, end: 3000, views: 0 },
           { text: "калинка", start: 3000, end: 4500, views: 0 },
@@ -56,7 +56,7 @@ export const sampleSongs: Song[] = [
         end: 12000,
         original: "В саду ягода малинка, малинка моя!",
         translation: "In the garden berry raspberry, my raspberry!",
-        words: [
+        utterances: [
           { text: "В", start: 6000, end: 6500, views: 0 },
           { text: "саду", start: 6500, end: 7500, views: 0 },
           { text: "ягода", start: 7500, end: 8500, views: 0 },
