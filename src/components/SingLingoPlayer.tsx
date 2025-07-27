@@ -14,7 +14,7 @@ interface SingLingoPlayerProps {
 export default function SingLingoPlayer({ song, onUtteranceTap }: SingLingoPlayerProps) {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  // TODO: Add currentTime state when implementing time display
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [currentUtteranceIndex, setCurrentUtteranceIndex] = useState(0);
   const [utteranceViewCounts, setUtteranceViewCounts] = useState<Record<string, number>>({});
@@ -71,7 +71,7 @@ export default function SingLingoPlayer({ song, onUtteranceTap }: SingLingoPlaye
           const status = await sound.getStatusAsync();
           if (status.isLoaded) {
             const currentMs = status.positionMillis || 0;
-            setCurrentTime(currentMs);
+            // TODO: Track currentTime here when implementing time display
             updateCurrentIndices(currentMs);
             trackCurrentUtterances(currentMs);
           }
@@ -161,7 +161,7 @@ export default function SingLingoPlayer({ song, onUtteranceTap }: SingLingoPlaye
 
     try {
       await sound.setPositionAsync(utterance.start);
-      setCurrentTime(utterance.start);
+      // TODO: Track time position when implementing time display
       
       // Clear tracked utterances so they can be re-tracked
       trackedUtterances.current.clear();
